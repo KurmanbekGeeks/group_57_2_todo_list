@@ -3,8 +3,38 @@ from db import main_db
 
 
 def main(page: ft.Page):
-    pass
+    page.title = "ToDo list"
+    page.theme_mode = ft.ThemeMode.LIGHT
 
+    task_list = ft.Column(spacing=10)
+
+    def create_task_row(task_id, task_text):
+        task_field = ft.TextField(value=task_text, read_only=True)
+
+        def enable_edit(_):
+            task_field.read_only = False
+            task_field.update()
+
+        enable_button = ft.IconButton(icon=ft.Icons.EDIT, on_click=enable_edit)
+
+        return ft.Row([task_field, enable_button], alignment=ft.MainAxisAlignment.START)
+    
+    def add_task(_):
+        if task_input.value:
+            task = task_input.value
+            task_id = main_db.add_task(task)
+            task_list.controls.append(create_task_row(task_id=task_id, task_text=task))
+            task_input.value = ''
+            page.update()
+            
+
+    task_input = ft.TextField(label="Введите новую задачу", read_only=False, expand=True)
+    add_button = ft.IconButton(icon=ft.Icons.ADD_COMMENT, tooltip='Добавить задачу')
+
+    # page.add(name_input, add_button)
+    page.add(ft.Row(
+        [task_input, add_button], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+        ))
 
 
 if __name__ == "__main__":
